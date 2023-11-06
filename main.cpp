@@ -1,5 +1,4 @@
 #include "crow.h"
-#include "crow/middlewares/cors.h"
 #include "idGenerator.h"
 #include "game.h"
 #include "json.hpp"
@@ -14,16 +13,7 @@
 int main()
 {
 
-    crow::App<crow::CORSHandler> app;
-    auto& cors = app.get_middleware<crow::CORSHandler>();
-    cors
-        .global()
-        .headers("X-Custom-Header", "Upgrade-Insecure-Requests")
-        .methods("POST"_method, "GET"_method)
-        .prefix("/")
-        .origin("*")
-        .prefix("/nocors")
-        .ignore();
+    crow::SimpleApp app;
     
 
     std::vector<Game> games;
