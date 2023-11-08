@@ -1,24 +1,35 @@
 #pragma once
-#include<ctime>
-class Loger {
-   private:
-	float startTime;
-	float endTime;
+#include <ctime>
+#include <iostream>
 
-    public:
-		void start() {
-			this->startTime = time(NULL);
-		}
+class Logger {
+private:
+    time_t startTime;
+    time_t endTime;
 
-		void end() {
-			this->endTime = time(NULL);
-		}
+public:
+    void start() {
+        startTime = time(0);
+    }
 
-		bool check(int penalty){
-			if (endTime - startTime + penalty < 60)
-				return true;
-			else
-				return false;
-		}
-	
+    void end() {
+        endTime = time(0);
+    }
+
+    bool check(int penalty) {
+        int elapsedSeconds = endTime - startTime;
+
+        if (elapsedSeconds + penalty < 60) {
+
+            return true;
+        }
+        else {
+             
+            return false;
+        }
+    }
+
+    int getTime() {
+        return endTime - startTime;
+    }
 };
