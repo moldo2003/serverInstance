@@ -6,7 +6,7 @@
 #include <iostream>
 #include <vector>
 #include "questions.h"
-
+#include "leaderbord.h"
 
 
 
@@ -27,6 +27,8 @@ int main()
     
 
     std::vector<Game> games;
+    LeaderBoard leaderboard = LeaderBoard(); 
+    Questions q = Questions();
 
     CROW_ROUTE(app, "/")
         ([]() {
@@ -39,13 +41,13 @@ int main()
             });
 
     CROW_ROUTE(app, "/startGame")
-        ([&games](const crow::request& req) {
+        ([&games,&leaderboard,&q](const crow::request& req) {
         std::string response = "No User ID";
 
         if (req.url_params.get("userId") != NULL) {
             std::string userId = req.url_params.get("userId");
             std::cout << userId;
-            games.push_back(Game(userId));
+            games.push_back(Game(userId,&leaderboard,&q));
             response =  std::to_string(games.size());
         }
         return response;
@@ -76,19 +78,28 @@ int main()
      );
     CROW_ROUTE(app, "/verifyQuestion")(
         [&games](const crow::request& req) {
-            if (req.url_params.get("userId") != NULL && req.url_params.get("gameId") != NULL && req.url_params.get("index") != NULL && req.url_params.get("answer") != NULL) {
+            if (req.url_params.get("userId") != NULL && req.url_params.get("gameId") != NULL && req.url_params.get("index") != NULL && req.url_params.get("answer") != NULL && req.url_params.get("name") != NULL) {
                 std::string userId = req.url_params.get("userId");
                 int gameId = std::atoi(req.url_params.get("gameId"));
                 std::string answer = req.url_params.get("answer");
                 int index = std::atoi(req.url_params.get("index"));
+                std::string name = req.url_params.get("name");
 
-                std::cout << index;
                 if (games[gameId - 1].compareId(userId))
-                    return games[gameId - 1].verifyQuestion(index, answer);
+                    return games[gameId - 1].verifyQuestion(index, answer,name);
             }
             return std::string("InvalidParams");
         }
      );
+
+    CROW_ROUTE(app, "/getLeaderboard")(
+        [&leaderboard]() {
+            crow::response response(leaderboard.toJson().dump());
+            response.add_header("Content-Type", "application/json");
+            return response;
+        }
+    );
+
 
 
     app.port(7777).run();
