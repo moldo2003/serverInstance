@@ -6,7 +6,7 @@
 #include <iostream>
 #include <vector>
 #include "questions.h"
-#include "leaderbord.h"
+#include "leaderboard.h"
 
 
 
