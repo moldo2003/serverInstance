@@ -1,24 +1,29 @@
+#pragma once
 #include <iostream>
 #include <string.h>
 #include  "questions.h"
 #include "loger.h"
+#include "leaderbord.h"
 class Game {
 private:
 
     std::string userId;
     int level;
     int penalty;
-    int answerd[6] = { 0,0,0,0,0 };
-    Questions q = Questions();
-    Loger loger;
+    int answerd[6] = { 0,0,0,0,0};
+    Questions* q ;
+    Logger loger = Logger();
+    LeaderBoard* leaderboard;
     std::vector<Question> gameQuestions;
 public:
 
-    Game(std::string userId) {
+    Game(std::string userId , LeaderBoard* leaderboard, Questions* q) {
         this->userId = userId;
         this->penalty = 0;
         this->level = 0;
-        gameQuestions = q.generare_intrebari();
+        this->leaderboard = leaderboard;
+        this->q = q;
+        gameQuestions = q->generare_intrebari();
     }
 
     nlohmann::json toJson() {
@@ -26,7 +31,7 @@ public:
         nlohmann::json response;
 
         response["level"] = std::to_string(level);
-        response["questions"] = q.toJson(gameQuestions);
+        response["questions"] = q->toJson(gameQuestions);
 
         return response;
     }
@@ -35,10 +40,10 @@ public:
         return this->userId == userId;
     }
     
-    std::string verifyQuestion(int index,std::string raspuns) {
+    std::string verifyQuestion(int index,std::string raspuns,std::string name) {
         if (gameQuestions[index].verifyQuestion(raspuns) && answerd[index] == 0) {
             if (level == 4) {
-                return this->endGame();
+                return this->endGame(name);
             }
             else {
                 answerd[index] = 1;
@@ -53,10 +58,11 @@ public:
         }
 
     }
-    std::string endGame() {
+    std::string endGame(std::string name) {
         loger.end();
         if (loger.check(penalty))
-        {
+        {   
+            leaderboard->checkLeaderBoard(name, loger.getTime() + penalty);
             return "GameValid";
 
             //verify in scoreboard
