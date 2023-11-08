@@ -3,7 +3,7 @@
 #include <string.h>
 #include  "questions.h"
 #include "loger.h"
-#include "leaderbord.h"
+#include "leaderboard.h"
 class Game {
 private:
 
